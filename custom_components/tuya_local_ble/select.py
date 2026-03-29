@@ -106,7 +106,7 @@ mapping: dict[str, TuyaBLECategorySelectMapping] = {
     ),
     "jtmspro": TuyaBLECategorySelectMapping(
         products={
-            "rlyxv7pe":  # Smart Lock
+            "rlyxv7pe":  # Gimdow Smart Lock
             [
                 TuyaBLESelectMapping(
                     dp_id=31,
@@ -132,7 +132,23 @@ mapping: dict[str, TuyaBLECategorySelectMapping] = {
                         entity_category=EntityCategory.CONFIG,
                     ),
                 ),
-            ]
+            ],
+            "n1qxwwic":  # Evanshow Z02
+            [
+                TuyaBLESelectMapping(
+                    dp_id=31,
+                    description=SelectEntityDescription(
+                        key="beep_volume",
+                        options=[
+                            "mute",
+                            "low",
+                            "normal",
+                            "high",
+                        ],
+                        entity_category=EntityCategory.CONFIG,
+                    ),
+                ),
+            ],
         }
     ),    
     "szjqr": TuyaBLECategorySelectMapping(

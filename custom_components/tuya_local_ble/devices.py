@@ -205,6 +205,10 @@ devices_database: dict[str, TuyaBLECategoryInfo] = {
             TuyaBLEProductInfo(
                 name="A1 PRO MAX",
             ),
+            "n1qxwwic":  # Evanshow Z02 device product_id
+            TuyaBLEProductInfo(
+                name="Evanshow Z02",
+            ),
         },
     ),    
     "szjqr": TuyaBLECategoryInfo(

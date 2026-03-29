@@ -80,9 +80,27 @@ mapping: dict[str, TuyaBLECategoryLockMapping] = {
                         key="manual_lock"
                     ),
                 ),
-            ]
+            ],
+            "n1qxwwic":  # Evanshow Z02
+            [
+                TuyaBLELockMapping(
+                    # dp 33 (passage mode) unlocks when set True
+                    dp_id_unlock=33,
+                    # dp 46 (manual_lock) sends the lock command
+                    dp_id_lock=46,
+                    # dp 47 (lock_motor_state) is the state indicator
+                    dp_id=47,
+                    # dp 52 (temporary_password_delete) used as NOP keep-alive
+                    dp_id_nop=52,
+                    keep_connect=True,
+                    keep_connect_timer=60,
+                    description=LockEntityDescription(
+                        key="manual_lock"
+                    ),
+                ),
+            ],
         }
-    ), 
+    ),
 }
 
 

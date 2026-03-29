@@ -53,6 +53,76 @@ class TuyaBLECategoryBinarySensorMapping:
     mapping: list[TuyaBLEBinarySensorMapping] | None = None
 
 mapping: dict[str, TuyaBLECategoryBinarySensorMapping] = {
+    "jtmspro": TuyaBLECategoryBinarySensorMapping(
+        products={
+            "n1qxwwic":  # Evanshow Z02
+            [
+                TuyaBLEBinarySensorMapping(
+                    dp_id=12,
+                    description=BinarySensorEntityDescription(
+                        key="unlock_fingerprint",
+                        icon="mdi:fingerprint",
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        entity_registry_enabled_default=False,
+                    ),
+                ),
+                TuyaBLEBinarySensorMapping(
+                    dp_id=13,
+                    description=BinarySensorEntityDescription(
+                        key="unlock_password",
+                        icon="mdi:form-textbox-password",
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        entity_registry_enabled_default=False,
+                    ),
+                ),
+                TuyaBLEBinarySensorMapping(
+                    dp_id=15,
+                    description=BinarySensorEntityDescription(
+                        key="unlock_card",
+                        icon="mdi:credit-card-wireless",
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        entity_registry_enabled_default=False,
+                    ),
+                ),
+                TuyaBLEBinarySensorMapping(
+                    dp_id=19,
+                    description=BinarySensorEntityDescription(
+                        key="unlock_ble",
+                        icon="mdi:bluetooth",
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        entity_registry_enabled_default=False,
+                    ),
+                ),
+                TuyaBLEBinarySensorMapping(
+                    dp_id=55,
+                    description=BinarySensorEntityDescription(
+                        key="unlock_temporary",
+                        icon="mdi:lock-open-variant",
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        entity_registry_enabled_default=False,
+                    ),
+                ),
+                TuyaBLEBinarySensorMapping(
+                    dp_id=62,
+                    description=BinarySensorEntityDescription(
+                        key="unlock_phone_remote",
+                        icon="mdi:cellphone-key",
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        entity_registry_enabled_default=False,
+                    ),
+                ),
+                TuyaBLEBinarySensorMapping(
+                    dp_id=63,
+                    description=BinarySensorEntityDescription(
+                        key="unlock_voice_remote",
+                        icon="mdi:microphone",
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        entity_registry_enabled_default=False,
+                    ),
+                ),
+            ],
+        },
+    ),
     "wk": TuyaBLECategoryBinarySensorMapping(
         products={
             "drlajpqc": [  # Thermostatic Radiator Valve

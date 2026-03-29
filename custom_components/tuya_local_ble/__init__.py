@@ -49,17 +49,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     coordinator = TuyaBLECoordinator(hass, device)
 
-    '''
     try:
         await device.update()
     except BLEAK_EXCEPTIONS as ex:
         raise ConfigEntryNotReady(
             f"Could not communicate with Tuya BLE device with address {address}"
         ) from ex
-    '''
-    #hass.async_create_task(device.update())
-
-    await device.update()
+    except Exception as ex:
+        raise ConfigEntryNotReady(
+            f"Unexpected error communicating with Tuya BLE device {address}"
+        ) from ex
     
     @callback
     def _async_update_ble(

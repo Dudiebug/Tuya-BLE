@@ -173,7 +173,7 @@ mapping: dict[str, TuyaBLECategorySensorMapping] = {
     ),
     "jtmspro": TuyaBLECategorySensorMapping(
         products={
-            "rlyxv7pe":  # Smart Lock
+            "rlyxv7pe":  # Gimdow Smart Lock
             [
                 TuyaBLESensorMapping(
                     dp_id=9,
@@ -195,7 +195,49 @@ mapping: dict[str, TuyaBLECategorySensorMapping] = {
                         "mdi:battery-alert",
                     ],
                 ),
-            ]
+            ],
+            "n1qxwwic":  # Evanshow Z02
+            [
+                TuyaBLESensorMapping(
+                    dp_id=9,
+                    description=SensorEntityDescription(
+                        key="battery_state",
+                        icon="mdi:battery",
+                        device_class=SensorDeviceClass.ENUM,
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        options=[
+                            BATTERY_STATE_HIGH,
+                            BATTERY_STATE_NORMAL,
+                            BATTERY_STATE_LOW,
+                            "poweroff",
+                        ],
+                    ),
+                    icons=[
+                        "mdi:battery-check",
+                        "mdi:battery-50",
+                        "mdi:battery-alert",
+                        "mdi:battery-off",
+                    ],
+                ),
+                TuyaBLESensorMapping(
+                    dp_id=21,
+                    description=SensorEntityDescription(
+                        key="alarm_lock",
+                        icon="mdi:alarm-light",
+                        device_class=SensorDeviceClass.ENUM,
+                        entity_category=EntityCategory.DIAGNOSTIC,
+                        options=[
+                            "wrong_finger",
+                            "wrong_password",
+                            "low_battery",
+                            "anti_lock",
+                            "key_in",
+                            "door_pried",
+                            "motor_failure",
+                        ],
+                    ),
+                ),
+            ],
         }
     ),      
     "szjqr": TuyaBLECategorySensorMapping(
