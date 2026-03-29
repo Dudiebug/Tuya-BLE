@@ -84,14 +84,15 @@ mapping: dict[str, TuyaBLECategoryLockMapping] = {
             "n1qxwwic":  # Evanshow Z02
             [
                 TuyaBLELockMapping(
-                    # dp 33 (passage mode) unlocks when set True
+                    # DP 33 is the "always unlock" switch (passage mode).
+                    # All HA-initiated unlocks go through DP 33.
+                    # Physical unlocks (fingerprint DP 12, password DP 13,
+                    # card DP 15) are handled as separate binary sensor
+                    # entities and never trigger this DP.
                     dp_id_unlock=33,
-                    # dp 46 (manual_lock) sends the lock command
-                    dp_id_lock=46,
-                    # dp 47 (lock_motor_state) is the state indicator
-                    dp_id=47,
-                    # dp 52 (temporary_password_delete) used as NOP keep-alive
-                    dp_id_nop=52,
+                    dp_id_lock=46,   # manual_lock
+                    dp_id=47,        # lock_motor_state — state indicator
+                    dp_id_nop=52,    # temporary_password_delete — safe NOP
                     keep_connect=True,
                     keep_connect_timer=60,
                     description=LockEntityDescription(
