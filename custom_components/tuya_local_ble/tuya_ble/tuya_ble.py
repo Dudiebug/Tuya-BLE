@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import logging
+import random
 import secrets
 import time
 from collections.abc import Callable
@@ -556,20 +557,25 @@ class TuyaBLEDevice:
             await asyncio.sleep(0.01)
             if self._client and self._client.is_connected and self._is_paired:
                 return
-            attempts_count = 100
-            while attempts_count > 0:
-                attempts_count -= 1
-                if attempts_count == 0:
+            max_attempts = 10
+            backoff = 1.0
+            for attempt in range(max_attempts):
+                if attempt == max_attempts - 1:
                     _LOGGER.error(
-                        "%s: Connecting, all attempts failed; RSSI: %s",
+                        "%s: Connecting, all %s attempts failed; RSSI: %s",
                         self.address,
+                        max_attempts,
                         self.rssi,
                     )
                     raise BleakNotFoundError()
                 try:
                     async with global_connect_lock:
                         _LOGGER.debug(
-                            "%s: Connecting; RSSI: %s", self.address, self.rssi
+                            "%s: Connecting (attempt %s/%s); RSSI: %s",
+                            self.address,
+                            attempt + 1,
+                            max_attempts,
+                            self.rssi,
                         )
                         client = await establish_connection(
                             BleakClientWithServiceCache,
@@ -580,21 +586,27 @@ class TuyaBLEDevice:
                             ble_device_callback=lambda: self._ble_device,
                         )
                 except BleakNotFoundError:
-                    _LOGGER.error(
-                        "%s: device not found, not in range, or poor RSSI: %s",
+                    _LOGGER.warning(
+                        "%s: BLE connection failed (BleakNotFoundError), RSSI: %s",
                         self.address,
                         self.rssi,
                         exc_info=True,
                     )
+                    await asyncio.sleep(backoff + random.uniform(0, backoff * 0.5))
+                    backoff = min(backoff * 2, 60)
                     continue
                 except BLEAK_EXCEPTIONS:
                     _LOGGER.debug(
                         "%s: communication failed", self.address, exc_info=True
                     )
+                    await asyncio.sleep(backoff + random.uniform(0, backoff * 0.5))
+                    backoff = min(backoff * 2, 60)
                     continue
                 except:
                     _LOGGER.debug("%s: unexpected error",
                                   self.address, exc_info=True)
+                    await asyncio.sleep(backoff + random.uniform(0, backoff * 0.5))
+                    backoff = min(backoff * 2, 60)
                     continue
 
                 if client and client.is_connected:
@@ -674,9 +686,10 @@ class TuyaBLEDevice:
         else:
             _LOGGER.error("%s: No client device", self.address)
 
-    async def _reconnect(self) -> None:
+    async def _reconnect(self, attempts_remaining: int = 5) -> None:
         """Attempt a reconnect"""
-        _LOGGER.debug("%s: Reconnect, ensuring connection", self.address)
+        _LOGGER.debug("%s: Reconnect, ensuring connection (attempts remaining: %s)",
+                       self.address, attempts_remaining)
         async with self._seq_num_lock:
             self._current_seq_num = 1
         try:
@@ -686,15 +699,22 @@ class TuyaBLEDevice:
             if self._expected_disconnect:
                 return
             _LOGGER.debug("%s: Reconnect, connection ensured", self.address)
-        except BLEAK_EXCEPTIONS:  # BleakNotFoundError:
+        except BLEAK_EXCEPTIONS:
+            if attempts_remaining <= 1:
+                _LOGGER.error(
+                    "%s: Reconnect failed after max attempts, giving up",
+                    self.address,
+                )
+                return
             _LOGGER.debug(
                 "%s: Reconnect, failed to ensure connection - backing off",
                 self.address,
                 exc_info=True,
             )
             await asyncio.sleep(BLEAK_BACKOFF_TIME)
-            _LOGGER.debug("%s: Reconnecting again", self.address)
-            asyncio.create_task(self._reconnect())
+            _LOGGER.debug("%s: Reconnecting again (%s attempts remaining)",
+                          self.address, attempts_remaining - 1)
+            asyncio.create_task(self._reconnect(attempts_remaining=attempts_remaining - 1))
 
     @staticmethod
     def _calc_crc16(data: bytes) -> int:
@@ -886,7 +906,7 @@ class TuyaBLEDevice:
                 await self._send_packets_locked(packets)
             except BleakNotFoundError:
                 _LOGGER.error(
-                    "%s: device not found, no longer in range, or poor RSSI: %s",
+                    "%s: BLE connection lost (BleakNotFoundError), RSSI: %s",
                     self.address,
                     self.rssi,
                     exc_info=True,
@@ -1245,7 +1265,7 @@ class TuyaBLEDevice:
 
         if packet_num < self._input_expected_packet_num:
             _LOGGER.error(
-                "%s: Unexpcted packet (number %s) in notifications, " "expected %s",
+                "%s: Unexpected packet (number %s) in notifications, " "expected %s",
                 self.address,
                 packet_num,
                 self._input_expected_packet_num,
@@ -1271,7 +1291,7 @@ class TuyaBLEDevice:
 
         if len(self._input_buffer) > self._input_expected_length:
             _LOGGER.error(
-                "%s: Unexpcted length of data in notifications, "
+                "%s: Unexpected length of data in notifications, "
                 "received %s expected %s",
                 self.address,
                 len(self._input_buffer),
